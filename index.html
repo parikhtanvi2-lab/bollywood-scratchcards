@@ -3,35 +3,27 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>Bollywood Scratch Cards 🎬</title>
+<title>Bollywood Scratch Card 🎬</title>
 <style>
   body {
     background: linear-gradient(180deg,#0a0f25 0%, #101a30 100%);
     color: #e6eef6;
     font-family: system-ui, sans-serif;
     margin: 0;
-    padding: 30px;
+    padding: 50px 20px;
     text-align: center;
   }
   h1 {
     margin-bottom: 15px;
   }
-  #cards {
-    display: grid;
-    grid-template-columns: repeat(auto-fill,minmax(160px,1fr));
-    gap: 15px;
-    justify-items: center;
-    margin-top: 25px;
-  }
   .card {
     position: relative;
-    width: 160px;
-    height: 200px;
+    width: 250px;
+    height: 300px;
+    margin: 20px auto;
     border-radius: 12px;
     overflow: hidden;
-    background: #102030;
-    color: white;
-    box-shadow: 0 3px 8px rgba(0,0,0,0.4);
+    box-shadow: 0 3px 12px rgba(0,0,0,0.5);
   }
   .card img {
     width: 100%;
@@ -53,22 +45,38 @@
     text-align: center;
     font-weight: bold;
     background: rgba(0,0,0,0.5);
-    padding: 6px 0;
+    padding: 8px 0;
     color: #fff;
-    font-size: 15px;
+    font-size: 18px;
+  }
+  button {
+    margin-top: 20px;
+    padding: 10px 25px;
+    font-size: 16px;
+    cursor: pointer;
+    border-radius: 8px;
+    border: none;
+    background-color: #ff4c4c;
+    color: white;
   }
 </style>
 </head>
 <body>
-<h1>Bollywood Scratch Cards 🎥</h1>
-<p>Scratch the silver layer to reveal your favorite star!</p>
+<h1>Bollywood Scratch Card 🎥</h1>
+<p>Scratch to reveal the Bollywood star!</p>
 
-<div id="cards"></div>
+<div class="card" id="card">
+  <img id="starImage" src="" alt="Star">
+  <div class="name" id="starName"></div>
+  <canvas id="scratchCanvas"></canvas>
+</div>
+
+<button id="newCardBtn">New Star</button>
 
 <script>
 // Bollywood stars + images
 const stars = [
-  {name:"Shah Rukh Khan", img:"https://assets.telegraphindia.com/telegraph/2025/Apr/1745928173_1738585049_1737974007_1720155212_shah-rukh-khan.jpg"},
+  {name:"Shah Rukh Khan", img:"https://upload.wikimedia.org/wikipedia/commons/8/8d/Shah_Rukh_Khan_2012.jpg"},
   {name:"Deepika Padukone", img:"https://upload.wikimedia.org/wikipedia/commons/5/55/Deepika_Padukone_Cannes_2022.jpg"},
   {name:"Ranveer Singh", img:"https://upload.wikimedia.org/wikipedia/commons/4/49/Ranveer_Singh_promoting_Gully_Boy.jpg"},
   {name:"Alia Bhatt", img:"https://upload.wikimedia.org/wikipedia/commons/8/80/Alia_Bhatt_in_2023.jpg"},
@@ -90,65 +98,72 @@ const stars = [
   {name:"Ranbir Kapoor", img:"https://upload.wikimedia.org/wikipedia/commons/1/1f/Ranbir_Kapoor_promoting_Tamasha.jpg"}
 ];
 
-const container = document.getElementById("cards");
+const card = document.getElementById("card");
+const canvas = document.getElementById("scratchCanvas");
+const ctx = canvas.getContext("2d");
+const imgEl = document.getElementById("starImage");
+const nameEl = document.getElementById("starName");
+const newCardBtn = document.getElementById("newCardBtn");
 
-stars.forEach(star => {
-  const card = document.createElement("div");
-  card.className = "card";
+let isDrawing = false;
 
-  const img = document.createElement("img");
-  img.src = star.img;
-  img.alt = star.name;
-  card.appendChild(img);
-
-  const nameDiv = document.createElement("div");
-  nameDiv.className = "name";
-  nameDiv.textContent = star.name;
-  card.appendChild(nameDiv);
-
-  const canvas = document.createElement("canvas");
-  card.appendChild(canvas);
-  container.appendChild(card);
-
-  const ctx = canvas.getContext("2d");
+// Resize canvas
+function resizeCanvas() {
   const rect = card.getBoundingClientRect();
   canvas.width = rect.width;
   canvas.height = rect.height;
+}
+window.addEventListener("resize", resizeCanvas);
+resizeCanvas();
 
-  // Scratch overlay
-  const grad = ctx.createLinearGradient(0,0,rect.width,rect.height);
+// Pick a random star
+function showRandomStar() {
+  const star = stars[Math.floor(Math.random() * stars.length)];
+  imgEl.src = star.img;
+  nameEl.textContent = star.name;
+
+  // Reset scratch overlay
+  ctx.globalCompositeOperation = "source-over";
+  ctx.clearRect(0,0,canvas.width,canvas.height);
+
+  const grad = ctx.createLinearGradient(0,0,canvas.width,canvas.height);
   grad.addColorStop(0,"#aaa");
   grad.addColorStop(1,"#ccc");
   ctx.fillStyle = grad;
-  ctx.fillRect(0,0,rect.width,rect.height);
+  ctx.fillRect(0,0,canvas.width,canvas.height);
   ctx.fillStyle = "#666";
-  ctx.font = "bold 16px sans-serif";
-  ctx.fillText("Scratch me!", 30, rect.height/2);
+  ctx.font = "bold 20px sans-serif";
+  ctx.fillText("Scratch Me!", 50, canvas.height/2);
+}
 
-  // Scratch effect
-  let isDrawing = false;
-  function draw(x, y) {
-    ctx.globalCompositeOperation = "destination-out";
-    ctx.beginPath();
-    ctx.arc(x, y, 15, 0, Math.PI * 2);
-    ctx.fill();
-  }
+// Scratch effect
+function draw(x, y) {
+  ctx.globalCompositeOperation = "destination-out";
+  ctx.beginPath();
+  ctx.arc(x, y, 20, 0, Math.PI * 2);
+  ctx.fill();
+}
 
-  function getPos(e) {
-    const r = canvas.getBoundingClientRect();
-    if (e.touches) e = e.touches[0];
-    return { x: e.clientX - r.left, y: e.clientY - r.top };
-  }
+function getPos(e) {
+  const r = canvas.getBoundingClientRect();
+  if(e.touches) e = e.touches[0];
+  return {x: e.clientX - r.left, y: e.clientY - r.top};
+}
 
-  canvas.addEventListener("mousedown", e => {isDrawing = true; draw(...Object.values(getPos(e)));});
-  canvas.addEventListener("mousemove", e => {if (isDrawing) draw(...Object.values(getPos(e)));});
-  canvas.addEventListener("mouseup", () => isDrawing = false);
-  canvas.addEventListener("mouseleave", () => isDrawing = false);
+canvas.addEventListener("mousedown", e=>{isDrawing=true; draw(...Object.values(getPos(e)));});
+canvas.addEventListener("mousemove", e=>{if(isDrawing) draw(...Object.values(getPos(e)));});
+canvas.addEventListener("mouseup", ()=>isDrawing=false);
+canvas.addEventListener("mouseleave", ()=>isDrawing=false);
 
-  canvas.addEventListener("touchstart", e => {isDrawing = true; draw(...Object.values(getPos(e)));}, {passive:false});
-  canvas.addEventListener("touchmove", e => {if (isDrawing) draw(...Object.values(getPos(e)));}, {passive:false});
-  canvas.addEventListener("touchend", () => isDrawing = false);
-});
+canvas.addEventListener("touchstart", e=>{isDrawing=true; draw(...Object.values(getPos(e)));}, {passive:false});
+canvas.addEventListener("touchmove", e=>{if(isDrawing) draw(...Object.values(getPos(e)));}, {passive:false});
+canvas.addEventListener("touchend", ()=>isDrawing=false);
+
+// New card button
+newCardBtn.addEventListener("click", showRandomStar);
+
+// Show first star on load
+showRandomStar();
 </script>
 </body>
 </html>
