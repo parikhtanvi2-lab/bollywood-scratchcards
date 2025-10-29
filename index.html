@@ -73,6 +73,14 @@
 
 <button id="newCardBtn">New Star</button>
 
+  function shuffleArray(arr) {
+  for (let i = arr.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [arr[i], arr[j]] = [arr[j], arr[i]];
+  }
+}
+
+
 <script>
 // Bollywood stars + images
 const stars = [
@@ -97,6 +105,9 @@ const stars = [
   {name:"Emraan Hashmi", img:"https://th.bing.com/th/id/OIF.hAK0ue0c9TaWdTW0S2SOTg?w=315&h=180&c=7&r=0&o=7&pid=1.7&rm=3"},
   {name:"Ranbir Kapoor", img:"https://th.bing.com/th/id/OIP.SoZU-zGK7poWC0EKcufDRQHaEo?w=267&h=180&c=7&r=0&o=7&pid=1.7&rm=3"}
 ];
+  shuffleArray(stars); // shuffle once at start
+let currentIndex = 0; // keeps track of which star to show next
+
 
 const card = document.getElementById("card");
 const canvas = document.getElementById("scratchCanvas");
