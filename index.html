@@ -1,0 +1,140 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Bollywood Scratch Cards 🎬</title>
+<style>
+  body {
+    background: linear-gradient(180deg,#071025 0%, #0f1724 100%);
+    color: #e6eef6;
+    font-family: system-ui, sans-serif;
+    margin: 0;
+    padding: 30px;
+    text-align: center;
+  }
+  h1 {
+    margin-bottom: 15px;
+  }
+  #cards {
+    display: grid;
+    grid-template-columns: repeat(auto-fill,minmax(150px,1fr));
+    gap: 12px;
+    justify-items: center;
+    margin-top: 25px;
+  }
+  .card {
+    position: relative;
+    width: 150px;
+    height: 150px;
+    border-radius: 12px;
+    overflow: hidden;
+    background: #102030;
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    user-select: none;
+    box-shadow: 0 3px 8px rgba(0,0,0,0.4);
+  }
+  canvas {
+    position: absolute;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    border-radius: 12px;
+    touch-action: none;
+  }
+</style>
+</head>
+<body>
+<h1>Bollywood Scratch Cards 🎥</h1>
+<p>Scratch to reveal the Bollywood star!</p>
+
+<div id="cards"></div>
+
+<script>
+const names = [
+  "Shah Rukh Khan",
+  "Deepika Padukone",
+  "Ranveer Singh",
+  "Alia Bhatt",
+  "Amitabh Bachchan",
+  "Priyanka Chopra",
+  "Aamir Khan",
+  "Kareena Kapoor",
+  "Salman Khan",
+  "Katrina Kaif",
+  "Hrithik Roshan",
+  "Kiara Advani",
+  "Varun Dhawan",
+  "Anushka Sharma",
+  "Vicky Kaushal",
+  "Madhuri Dixit",
+  "Ajay Devgn",
+  "Kartik Aaryan",
+  "Taapsee Pannu",
+  "Ranbir Kapoor"
+];
+
+const container = document.getElementById("cards");
+
+names.forEach(name => {
+  const card = document.createElement("div");
+  card.className = "card";
+  card.textContent = name;
+  
+  const canvas = document.createElement("canvas");
+  card.appendChild(canvas);
+  container.appendChild(card);
+
+  const ctx = canvas.getContext("2d");
+  const rect = card.getBoundingClientRect();
+  canvas.width = rect.width;
+  canvas.height = rect.height;
+
+  // Fill overlay
+  const grad = ctx.createLinearGradient(0,0,rect.width,rect.height);
+  grad.addColorStop(0,"#aaa");
+  grad.addColorStop(1,"#ccc");
+  ctx.fillStyle = grad;
+  ctx.fillRect(0,0,rect.width,rect.height);
+  ctx.fillStyle = "#666";
+  ctx.font = "bold 16px sans-serif";
+  ctx.fillText("Scratch me!", 20, rect.height/2);
+
+  // Scratch effect
+  let isDrawing = false;
+  function draw(x, y) {
+    ctx.globalCompositeOperation = "destination-out";
+    ctx.beginPath();
+    ctx.arc(x, y, 15, 0, Math.PI * 2);
+    ctx.fill();
+  }
+
+  function getPos(e) {
+    const r = canvas.getBoundingClientRect();
+    if (e.touches) e = e.touches[0];
+    return { x: e.clientX - r.left, y: e.clientY - r.top };
+  }
+
+  canvas.addEventListener("mousedown", e => {
+    isDrawing = true;
+    draw(...Object.values(getPos(e)));
+  });
+  canvas.addEventListener("mousemove", e => {
+    if (isDrawing) draw(...Object.values(getPos(e)));
+  });
+  canvas.addEventListener("mouseup", () => isDrawing = false);
+  canvas.addEventListener("touchstart", e => {
+    isDrawing = true;
+    draw(...Object.values(getPos(e)));
+  }, {passive:false});
+  canvas.addEventListener("touchmove", e => {
+    if (isDrawing) draw(...Object.values(getPos(e)));
+  }, {passive:false});
+  canvas.addEventListener("touchend", () => isDrawing = false);
+});
+</script>
+</body>
+</html>
