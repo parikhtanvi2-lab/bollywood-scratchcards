@@ -69,4 +69,86 @@
 // Bollywood stars + images
 const stars = [
   {name:"Shah Rukh Khan", img:"https://upload.wikimedia.org/wikipedia/commons/8/8d/Shah_Rukh_Khan_2012.jpg"},
-  {name:"Dee
+  {name:"Deepika Padukone", img:"https://upload.wikimedia.org/wikipedia/commons/5/55/Deepika_Padukone_Cannes_2022.jpg"},
+  {name:"Ranveer Singh", img:"https://upload.wikimedia.org/wikipedia/commons/4/49/Ranveer_Singh_promoting_Gully_Boy.jpg"},
+  {name:"Alia Bhatt", img:"https://upload.wikimedia.org/wikipedia/commons/8/80/Alia_Bhatt_in_2023.jpg"},
+  {name:"Amitabh Bachchan", img:"https://upload.wikimedia.org/wikipedia/commons/3/3f/Amitabh_Bachchan_2013.jpg"},
+  {name:"Priyanka Chopra", img:"https://upload.wikimedia.org/wikipedia/commons/a/a3/Priyanka_Chopra_2018.jpg"},
+  {name:"Aamir Khan", img:"https://upload.wikimedia.org/wikipedia/commons/1/12/Aamir_Khan_2015.jpg"},
+  {name:"Kareena Kapoor", img:"https://upload.wikimedia.org/wikipedia/commons/f/f4/Kareena_Kapoor_Khan_in_2022.jpg"},
+  {name:"Salman Khan", img:"https://upload.wikimedia.org/wikipedia/commons/0/0a/Salman_Khan_in_2023.jpg"},
+  {name:"Katrina Kaif", img:"https://upload.wikimedia.org/wikipedia/commons/8/8a/Katrina_Kaif_in_2023.jpg"},
+  {name:"Hrithik Roshan", img:"https://upload.wikimedia.org/wikipedia/commons/5/59/Hrithik_Roshan_2016.jpg"},
+  {name:"Kiara Advani", img:"https://upload.wikimedia.org/wikipedia/commons/4/4a/Kiara_Advani_promoting_Bhool_Bhulaiyaa_2.jpg"},
+  {name:"Varun Dhawan", img:"https://upload.wikimedia.org/wikipedia/commons/8/8d/Varun_Dhawan_in_2023.jpg"},
+  {name:"Anushka Sharma", img:"https://upload.wikimedia.org/wikipedia/commons/d/d4/Anushka_Sharma_promoting_Zero_in_2018.jpg"},
+  {name:"Vicky Kaushal", img:"https://upload.wikimedia.org/wikipedia/commons/e/ef/Vicky_Kaushal_promoting_Sardar_Udham.jpg"},
+  {name:"Madhuri Dixit", img:"https://upload.wikimedia.org/wikipedia/commons/e/e1/Madhuri_Dixit_in_2018.jpg"},
+  {name:"Ajay Devgn", img:"https://upload.wikimedia.org/wikipedia/commons/f/f0/Ajay_Devgn_promoting_Tanhaji.jpg"},
+  {name:"Kartik Aaryan", img:"https://upload.wikimedia.org/wikipedia/commons/4/4f/Kartik_Aaryan_promoting_Bhool_Bhulaiyaa_2.jpg"},
+  {name:"Taapsee Pannu", img:"https://upload.wikimedia.org/wikipedia/commons/8/85/Taapsee_Pannu_promoting_Mission_Mangal.jpg"},
+  {name:"Ranbir Kapoor", img:"https://upload.wikimedia.org/wikipedia/commons/1/1f/Ranbir_Kapoor_promoting_Tamasha.jpg"}
+];
+
+const container = document.getElementById("cards");
+
+stars.forEach(star => {
+  const card = document.createElement("div");
+  card.className = "card";
+
+  const img = document.createElement("img");
+  img.src = star.img;
+  img.alt = star.name;
+  card.appendChild(img);
+
+  const nameDiv = document.createElement("div");
+  nameDiv.className = "name";
+  nameDiv.textContent = star.name;
+  card.appendChild(nameDiv);
+
+  const canvas = document.createElement("canvas");
+  card.appendChild(canvas);
+  container.appendChild(card);
+
+  const ctx = canvas.getContext("2d");
+  const rect = card.getBoundingClientRect();
+  canvas.width = rect.width;
+  canvas.height = rect.height;
+
+  // Scratch overlay
+  const grad = ctx.createLinearGradient(0,0,rect.width,rect.height);
+  grad.addColorStop(0,"#aaa");
+  grad.addColorStop(1,"#ccc");
+  ctx.fillStyle = grad;
+  ctx.fillRect(0,0,rect.width,rect.height);
+  ctx.fillStyle = "#666";
+  ctx.font = "bold 16px sans-serif";
+  ctx.fillText("Scratch me!", 30, rect.height/2);
+
+  // Scratch effect
+  let isDrawing = false;
+  function draw(x, y) {
+    ctx.globalCompositeOperation = "destination-out";
+    ctx.beginPath();
+    ctx.arc(x, y, 15, 0, Math.PI * 2);
+    ctx.fill();
+  }
+
+  function getPos(e) {
+    const r = canvas.getBoundingClientRect();
+    if (e.touches) e = e.touches[0];
+    return { x: e.clientX - r.left, y: e.clientY - r.top };
+  }
+
+  canvas.addEventListener("mousedown", e => {isDrawing = true; draw(...Object.values(getPos(e)));});
+  canvas.addEventListener("mousemove", e => {if (isDrawing) draw(...Object.values(getPos(e)));});
+  canvas.addEventListener("mouseup", () => isDrawing = false);
+  canvas.addEventListener("mouseleave", () => isDrawing = false);
+
+  canvas.addEventListener("touchstart", e => {isDrawing = true; draw(...Object.values(getPos(e)));}, {passive:false});
+  canvas.addEventListener("touchmove", e => {if (isDrawing) draw(...Object.values(getPos(e)));}, {passive:false});
+  canvas.addEventListener("touchend", () => isDrawing = false);
+});
+</script>
+</body>
+</html>
